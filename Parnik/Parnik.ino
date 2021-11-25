@@ -27,6 +27,8 @@ int windowsUpperTH = analogRead(DHT11.getTemperature()) + 2;
 int windowsLowerTH = analogRead(DHT11.getTemperature()) - 2;
 
 void setup() {
+  Serial.begin(9600);
+  
   
   pinMode(LED_YELLOW, OUTPUT);
   pinMode(LED_GREEN, OUTPUT);
@@ -34,9 +36,15 @@ void setup() {
   pinMode(POTPIN, INPUT);
   pinMode(rightButton, INPUT_PULLUP);
   pinMode(leftButton, INPUT_PULLUP);
+  pinMode(NTC, INPUT);
+  pinMode(LDR, INPUT);
 }
 
 void loop() {
+  int light = analogRead(LDR);
+  Serial.println(light);
+  float temp = DHT11.getTemperature();
+  Serial.println(temp);
   int windowsAngle = analogRead(POTPIN);
 
   windowsAngle = map(windowsAngle, 0, 1023, 0, 20);
@@ -49,8 +57,3 @@ void loop() {
   
 
 }
-
-void Temperature(){
-    float temp = DHT11.getTemperature();
-    Serial.println(temp);
-  }
