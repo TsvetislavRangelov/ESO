@@ -1,15 +1,6 @@
 #include "Display.h"
 #include "DHT11.h"
 
-// testing again
-
-
-//testing again 2
-
-//testing 3 (new commit)
-
-
-int test = 1;
 
 const int LED_YELLOW = 7;
 const int LED_GREEN = 5;
@@ -22,13 +13,14 @@ const int NTC = A1;
 
 bool windowsCheck = false;
 
+ int windowsUpperTH = (DHT11.getTemperature() + 2);
+ int windowsLowerTH = (DHT11.getTemperature() - 2);
 
-int windowsUpperTH = analogRead(DHT11.getTemperature()) + 2;
-int windowsLowerTH = analogRead(DHT11.getTemperature()) - 2;
 
 void setup() {
+
+
   Serial.begin(9600);
-  
   
   pinMode(LED_YELLOW, OUTPUT);
   pinMode(LED_GREEN, OUTPUT);
@@ -38,22 +30,25 @@ void setup() {
   pinMode(leftButton, INPUT_PULLUP);
   pinMode(NTC, INPUT);
   pinMode(LDR, INPUT);
+
+  Serial.println(windowsUpperTH);
+  Serial.println(windowsLowerTH);
 }
 
 void loop() {
-  int light = analogRead(LDR);
-  Serial.println(light);
+    Serial.println(windowsUpperTH);
+  Serial.println(windowsLowerTH);
   float temp = DHT11.getTemperature();
-  Serial.println(temp);
+  float humidity = DHT11.getHumidity();
+
+
+  int light = analogRead(LDR);
+
   int windowsAngle = analogRead(POTPIN);
 
   windowsAngle = map(windowsAngle, 0, 1023, 0, 20);
   Display.show(windowsAngle);
   
-  
 
-   
-  
-  
 
 }
