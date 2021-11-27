@@ -1,7 +1,7 @@
 #include "Display.h"
 #include "DHT11.h"
 
-
+//pins
 const int LED_YELLOW = 7;
 const int LED_GREEN = 5;
 const int LED_BLUE = 6;
@@ -11,11 +11,16 @@ const int leftButton = 8;
 const int LDR = A2;
 const int NTC = A1;
 
-bool windowsCheck = false;
+//global variables
+int state = 0;
 
- int windowsUpperTH = (DHT11.getTemperature() + 2);
- int windowsLowerTH = (DHT11.getTemperature() - 2);
+//windows variables
+bool windowsCheck;
 
+float windowsUpperTH = 22.00;
+float windowsLowerTH = 19.00;
+
+int closedWindows = 0;
 
 void setup() {
 
@@ -30,25 +35,34 @@ void setup() {
   pinMode(leftButton, INPUT_PULLUP);
   pinMode(NTC, INPUT);
   pinMode(LDR, INPUT);
-
-  Serial.println(windowsUpperTH);
-  Serial.println(windowsLowerTH);
 }
 
 void loop() {
-    Serial.println(windowsUpperTH);
-  Serial.println(windowsLowerTH);
+  //getting the sensor values
   float temp = DHT11.getTemperature();
-  float humidity = DHT11.getHumidity();
-
-
   int light = analogRead(LDR);
+  Windows();
 
+  Serial.println(temp);
+
+
+
+}
+
+void Windows(){
+  float temp = DHT11.getTemperature();
   int windowsAngle = analogRead(POTPIN);
 
   windowsAngle = map(windowsAngle, 0, 1023, 0, 20);
   Display.show(windowsAngle);
+
+  if(temp >= windowsUpperTH || windowsAngle >= 1 && windowsAngle <= 20){
+      windowsCheck = true;
+      digitalWrite(LED_GREEN, HIGH);
+    }
+   else if(temp <= windowsLowerTH || windowsAngle == 0 ){
+      windowsCheck = false;
+      digitalWrite(LED_GREEN, LOW);
+    }
   
-
-
-}
+  }
