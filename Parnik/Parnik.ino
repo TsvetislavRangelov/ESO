@@ -1,4 +1,4 @@
-
+#include "Display.h"
 #include "DHT11.h"
 
 //pins
@@ -12,6 +12,9 @@ const int LDR = A2;
 const int NTC = A1;
 
 //global variables
+unsigned long currentTime = millis();
+//unsigned long maxTime = millis(30000); // maximum runtime of sprinklers
+
 float humidity;
 int light;
 float temp;
@@ -20,8 +23,8 @@ int state = 0;
 //windows variables
 bool windowsCheck;
 
-float windowsUpperTH = 23.00;
-float windowsLowerTH = 21.00;
+float windowsUpperTH = 18.00;
+float windowsLowerTH = 16.00;
 
 //shades variables
 
@@ -33,14 +36,14 @@ int shadesLowerTH =  150;
 
 //sprinkler variables
 
+bool sprinklersCheck;
+
 float sprinklersUpperTH = 45.00;
 float sprinklersLowerTH = 42.00;
 
 
 void setup() {
-
-  Serial.println(shadesUpperTH);
-  Serial.println(shadesLowerTH);
+  Display.clear();
   Serial.begin(9600);
   
   pinMode(LED_YELLOW, OUTPUT);
@@ -57,40 +60,45 @@ void loop() {
   light = analogRead(LDR);
   //getting the sensor values
   temp = DHT11.getTemperature();
-  Sprinklers();
+  //Sprinklers();
   //using a sequence state pattern here
-  //Shades(); // shades are state 2
-  //Windows(); // windows are state 1
+  Shades(); // shades are state 2
+  Windows(); // windows are state 1
 
   //do the display feature here (button only)
   
-  Serial.println(humidity);
-  //Serial.println(temp);
+  //Serial.println(humidity);
+  Serial.println(temp);
 }
 
 //
 
-//void Windows(){
-//  float temp = DHT11.getTemperature();
-//  int windowsAngle = analogRead(POTPIN);
-//
-//  windowsAngle = map(windowsAngle, 0, 1023, 0, 20);
-//  
-//
-//  if(temp >= windowsUpperTH && windowsAngle >= 1){
-//    digitalWrite(LED_GREEN, HIGH);
-//    windowsCheck = true;
-//     
-//      if(windowsAngle != 20){
-//        
-//        Display.show(windowsAngle);
-//        }   
-//    }
-//   else if(temp <= windowsLowerTH || windowsAngle == 0){
-//      windowsCheck = false;
-//      digitalWrite(LED_GREEN, LOW);
-//    }
-//  }
+void Windows(){
+ float temp = DHT11.getTemperature();
+  int windowsAngle = analogRead(POTPIN);
+
+ windowsAngle = map(windowsAngle, 0, 1023, 0, 20);
+  
+
+ if(temp >= windowsUpperTH && windowsAngle >= 1){
+    digitalWrite(LED_GREEN, HIGH);
+    windowsCheck = true;
+    
+    Display.show(windowsAngle);
+    }
+   else if(temp <= windowsLowerTH){
+      windowsCheck = false;
+      digitalWrite(LED_GREEN, LOW);
+      windowsAngle = map(windowsAngle, 0, 1023, 0, 20);
+      Display.show(windowsAngle);
+   }
+   else if(temp >= windowsUpperTH && windowsAngle == 0){
+      windowsCheck = false;
+      digitalWrite(LED_GREEN, LOW);
+       windowsAngle = map(windowsAngle, 0, 1023, 0, 20);
+      Display.show(windowsAngle);
+    }
+ }
 
 void Shades(){
     light = analogRead(LDR);
@@ -110,7 +118,8 @@ void Sprinklers(){
    unsigned long currentTime = millis();
    humidity = DHT11.getHumidity();
 
-   if(humidity >= sprinklersUpperTH){
-    
+   if(humidity <= sprinklersUpperTH){
+      sprinklersCheck = true;
+      
     }
   }
