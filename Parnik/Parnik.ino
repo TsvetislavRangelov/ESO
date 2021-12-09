@@ -12,7 +12,7 @@ const int NTC = A1;
 
 //global variables
 unsigned long sprinkleTime;
-const int maxTime = 30000; // maximum runtime of sprinklers (in milliseconds)
+const int maxTime = 30000; // runtime of sprinklers (in milliseconds)
 
 float humidity;
 int light;
@@ -56,7 +56,7 @@ void setup() {
 
 void loop() {
   humidity = DHT11.getHumidity();
-  int windowsAngle = analogRead(POTPIN);
+  windowsAngle = analogRead(POTPIN);
   unsigned long currentTime = millis();
   int button = digitalRead(Button);
   light = analogRead(LDR);
@@ -72,7 +72,7 @@ void loop() {
 
   windowsAngle = map(windowsAngle, 0, 1023, 0, 20);
 
-
+// windows
   if (temp >= windowsUpperTH && windowsAngle >= 1) {
     digitalWrite(LED_GREEN, HIGH);
     windowsCheck = true;
@@ -91,7 +91,7 @@ void loop() {
     windowsAngle = map(windowsAngle, 0, 1023, 0, 20);
    
   }
-
+// shades
   if (light >= shadesUpperTH) {
     shadesCheck = true;
     digitalWrite(LED_YELLOW, HIGH);
@@ -100,9 +100,13 @@ void loop() {
     shadesCheck = false;
     digitalWrite(LED_YELLOW, LOW);
   }
-  humidity = DHT11.getHumidity();
+ 
 
 //problem 1
+//sprinklers
+
+//keep a state
+//solution ln 110 collides with 118 and 111
   if (humidity <= sprinklersLowerTH) {
     if (currentTime - sprinkleTime > maxTime) {
       digitalWrite(LED_BLUE, HIGH);
@@ -117,8 +121,6 @@ void loop() {
       }
   }
   //do the display feature here (button only)
-
-  Serial.println(light);
 
   if (lastButtonState != button) {
     lastButtonState = button;
