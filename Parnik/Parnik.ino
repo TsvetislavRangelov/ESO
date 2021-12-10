@@ -30,7 +30,7 @@ int lastButtonState = HIGH;
 int lastPotPinValue = 0;
 String windowsMessage = "";
 int windowsAngle;
-bool windowsCheck;
+bool windowsCheck = false;
 
 float windowsUpperTH = 22.00;
 float windowsLowerTH = 20.00;
@@ -38,7 +38,7 @@ float windowsLowerTH = 20.00;
 //shades variables
 String shadesMessage = "";
 
-bool shadesCheck;
+bool shadesCheck = false;
 
 int shadesUpperTH = 300;
 int shadesLowerTH = 200;
