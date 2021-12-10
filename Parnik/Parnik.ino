@@ -32,8 +32,8 @@ String windowsMessage = "";
 int windowsAngle;
 bool windowsCheck = false;
 
-float windowsUpperTH = 22.00;
-float windowsLowerTH = 20.00;
+float windowsUpperTH = 21.00;
+float windowsLowerTH = 19.00;
 
 //shades variables
 String shadesMessage = "";
@@ -45,7 +45,7 @@ int shadesLowerTH = 200;
 
 
 //sprinkler variables
-String sprinklerMessage = "";
+String sprinklersMessage = "";
 
 bool sprinklersCheck = false;
 float sprinklersLowerTH = 52.00;
@@ -53,9 +53,9 @@ float sprinklersLowerTH = 52.00;
 
 
 void setup() {
-  if(humidity > 90.00){ // setting an upper limit for humidity so that there are no possible values above 90, otherwise the sensor gets stuck
+  if (humidity > 90.00) { // setting an upper limit for humidity so that there are no possible values above 90, otherwise the sensor gets stuck
     humidity = 90.00;
-    }
+  }
   //getting both Humidity and Temperature at the start, otherwise the sensors won't read anything on startup
   getHumidity();
   getTemperature();
@@ -75,7 +75,6 @@ void loop() {
   currentTime = millis();
   int button = digitalRead(Button);
   int light = analogRead(LDR);
-
   windowsAngle = analogRead(POTPIN);
   windowsAngle = map(windowsAngle, 0, 1023, 0, 20);
   if (currentTime - humidityTime > humidityInterval) {
@@ -91,18 +90,33 @@ void loop() {
   // windows
   if (temp >= windowsUpperTH && windowsAngle >= 1) {
     digitalWrite(LED_GREEN, HIGH);
-    windowsCheck = true;
+    if (!windowsCheck) {
+      windowsCheck = true;
+      windowsMessage = "OPEN";
+      Serial.println(windowsMessage);
+    }
+
   }
   if (temp <= windowsLowerTH) {
-    windowsCheck = false;
-    digitalWrite(LED_GREEN, LOW);
     windowsAngle = map(windowsAngle, 0, 1023, 0, 20); // remapping since sensor doesn't read potpin in the false conditionals
+
+    digitalWrite(LED_GREEN, LOW);
+    if (windowsCheck) {
+      windowsCheck = false;
+      windowsMessage = "CLOSED";
+      Serial.println(windowsMessage);
+    }
+
 
   }
   if (temp >= windowsUpperTH && windowsAngle == 0) {
-    windowsCheck = false;
     digitalWrite(LED_GREEN, LOW);
     windowsAngle = map(windowsAngle, 0, 1023, 0, 20);
+    if (windowsCheck) {
+      windowsCheck = false;
+      windowsMessage = "CLOSED";
+      Serial.println(windowsMessage);
+    }
 
   }
   //conditional windowsAngle change
@@ -110,7 +124,7 @@ void loop() {
     state = 3;
     lastPotPinValue = windowsAngle; //saving the previous value of the potpin
   }
-  
+
 
   if (Serial.available()) {
     String message = Serial.readString();
@@ -120,31 +134,45 @@ void loop() {
 
   // shades
   if (light >= shadesUpperTH) {
-    shadesCheck = true;
     digitalWrite(LED_YELLOW, HIGH);
+    if (!shadesCheck) {
+      shadesCheck = true;
+      shadesMessage = "LOWERED";
+      Serial.println(shadesMessage);
+    }
   }
   else if (light <= shadesLowerTH) {
-    shadesCheck = false;
     digitalWrite(LED_YELLOW, LOW);
+    if (shadesCheck) {
+      shadesCheck = false;
+      shadesMessage = "RAISED";
+      Serial.println(shadesMessage);
+    }
   }
   if (humidity <= sprinklersLowerTH) {
     //    Serial.println(sprinkleTime);
     //    Serial.println(currentTime);
     //    Serial.println(sprinkleTime - sprinklersRunTime);
     digitalWrite(LED_BLUE, HIGH);
-    sprinklersCheck = true;
+    if (!sprinklersCheck) {
+      sprinklersCheck = true;
+      sprinklersMessage = "ON";
+      Serial.println(sprinklersMessage);
+    }
     sprinkleTime = currentTime;
   }
 
   else {
     if (sprinkleTime + sprinklersRunTime < currentTime) {
       digitalWrite(LED_BLUE, LOW);
-      sprinklersCheck = false;
-
+      if (sprinklersCheck) {
+        sprinklersCheck = false;
+        sprinklersMessage = "OFF";
+        Serial.println(sprinklersMessage);
+      }
     }
   }
   //do the display feature here (button only)
-
   if (lastButtonState != button) {
     lastButtonState = button;
     if (button == LOW) {
@@ -175,11 +203,12 @@ void loop() {
     Display.clear();
     Display.show(windowsAngle);
   }
-
 }
 void getTemperature() {
   temp = DHT11.getTemperature();
+  Serial.println((String)temp + 't');
 }
 void getHumidity() {
   humidity = DHT11.getHumidity();
+  Serial.println((String)humidity + 'h');
 }

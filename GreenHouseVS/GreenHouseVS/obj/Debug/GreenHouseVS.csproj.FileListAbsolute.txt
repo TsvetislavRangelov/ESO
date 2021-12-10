@@ -1,0 +1,10 @@
+D:\Greenhouse\ESO\GreenHouseVS\GreenHouseVS\bin\Debug\GreenHouseVS.exe.config
+D:\Greenhouse\ESO\GreenHouseVS\GreenHouseVS\bin\Debug\GreenHouseVS.exe
+D:\Greenhouse\ESO\GreenHouseVS\GreenHouseVS\bin\Debug\GreenHouseVS.pdb
+D:\Greenhouse\ESO\GreenHouseVS\GreenHouseVS\obj\Debug\GreenHouseVS.csproj.AssemblyReference.cache
+D:\Greenhouse\ESO\GreenHouseVS\GreenHouseVS\obj\Debug\GreenHouseVS.Form1.resources
+D:\Greenhouse\ESO\GreenHouseVS\GreenHouseVS\obj\Debug\GreenHouseVS.Properties.Resources.resources
+D:\Greenhouse\ESO\GreenHouseVS\GreenHouseVS\obj\Debug\GreenHouseVS.csproj.GenerateResource.cache
+D:\Greenhouse\ESO\GreenHouseVS\GreenHouseVS\obj\Debug\GreenHouseVS.csproj.CoreCompileInputs.cache
+D:\Greenhouse\ESO\GreenHouseVS\GreenHouseVS\obj\Debug\GreenHouseVS.exe
+D:\Greenhouse\ESO\GreenHouseVS\GreenHouseVS\obj\Debug\GreenHouseVS.pdb

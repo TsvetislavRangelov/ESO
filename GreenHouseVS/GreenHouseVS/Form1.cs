@@ -43,7 +43,77 @@ namespace GreenHouseVS
 
                 logOutput = logOutput.Trim();
 
+                bool isTemp = float.TryParse(logOutput, out _);
+
+                //this is not a good way to do this, find something else, index out of bounds errors
+                //occur in some cases
+
+               /* if (logOutput[logOutput.Length - 1] == 't')
+                {
+                    //doing - 1 in .Length because the string always has 1 more character than the index
+                    //since we start counting at 0 for the index and length returns the number of chars in the string
+                    logOutput = logOutput.Remove(logOutput.Length - 1, 1);
+                    lblTemp.Text = logOutput;
+                }
+
+                bool isHumidity = float.TryParse(logOutput, out _);
+
+                if (logOutput[logOutput.Length - 1] == 'h')
+                {
+                    logOutput = logOutput.Remove(logOutput.Length - 1, 1);
+                    lblHumidity.Text = logOutput;
+                }
+
+                bool isLight = int.TryParse(logOutput, out _);
+
+                if (isLight)
+                {
+                    lblLight.Text = logOutput;
+                } */
+               
+                
+                    if (logOutput == "OPEN")
+                    {
+                        lblWindows.Text = logOutput;
+                        lbxLog.Items.Add("Windows are open");
+                    }
+
+                    else if(logOutput == "CLOSED")
+                    {
+                        lblWindows.Text = logOutput;
+                        lbxLog.Items.Add("Windows are closed");
+                    }
+
+                    else if(logOutput == "RAISED")
+                    {
+                        lblShades.Text = logOutput;
+                        lbxLog.Items.Add("Shades are raised");
+                    }
+
+                    else if(logOutput == "LOWERED")
+                    {
+                        lblShades.Text = logOutput;
+                        lbxLog.Items.Add("Shades are lowered");
+                    }
+
+                    else if(logOutput == "ON")
+                    {
+                    lblSprinklers.Text = logOutput;
+                    lbxLog.Items.Add("Sprinklers are on");
+                    }
+                    
+                    else if (logOutput == "OFF")
+                    {
+                    lblSprinklers.Text = logOutput;
+                    lbxLog.Items.Add("Sprinklers are off");
+                    }
+                
             }
+        }
+
+        private void btnClearLog_Click(object sender, EventArgs e)
+        {
+            lbxLog.Items.Clear();
         }
     }
 }
