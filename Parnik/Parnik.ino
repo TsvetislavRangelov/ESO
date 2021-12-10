@@ -27,27 +27,36 @@ int state = 0;
 int lastButtonState = HIGH;
 
 //windows variables
+int lastPotPinValue = 0;
+String windowsMessage = "";
 int windowsAngle;
 bool windowsCheck;
 
-float windowsUpperTH = 27.00;
-float windowsLowerTH = 25.00;
+float windowsUpperTH = 22.00;
+float windowsLowerTH = 20.00;
 
 //shades variables
+String shadesMessage = "";
 
 bool shadesCheck;
 
-int shadesUpperTH =  300;
-int shadesLowerTH =  150;
+int shadesUpperTH = 300;
+int shadesLowerTH = 200;
 
 
 //sprinkler variables
+String sprinklerMessage = "";
 
 bool sprinklersCheck = false;
-float sprinklersLowerTH = 50.00;
+float sprinklersLowerTH = 52.00;
+
 
 
 void setup() {
+  if(humidity > 90.00){ // setting an upper limit for humidity so that there are no possible values above 90, otherwise the sensor gets stuck
+    humidity = 90.00;
+    }
+  //getting both Humidity and Temperature at the start, otherwise the sensors won't read anything on startup
   getHumidity();
   getTemperature();
   Display.clear();
@@ -87,7 +96,7 @@ void loop() {
   if (temp <= windowsLowerTH) {
     windowsCheck = false;
     digitalWrite(LED_GREEN, LOW);
-    windowsAngle = map(windowsAngle, 0, 1023, 0, 20);
+    windowsAngle = map(windowsAngle, 0, 1023, 0, 20); // remapping since sensor doesn't read potpin in the false conditionals
 
   }
   if (temp >= windowsUpperTH && windowsAngle == 0) {
@@ -96,6 +105,19 @@ void loop() {
     windowsAngle = map(windowsAngle, 0, 1023, 0, 20);
 
   }
+  //conditional windowsAngle change
+  if (windowsAngle != lastPotPinValue) {
+    state = 3;
+    lastPotPinValue = windowsAngle; //saving the previous value of the potpin
+  }
+  
+
+  if (Serial.available()) {
+    String message = Serial.readString();
+    message.trim();
+
+  }
+
   // shades
   if (light >= shadesUpperTH) {
     shadesCheck = true;
@@ -105,9 +127,6 @@ void loop() {
     shadesCheck = false;
     digitalWrite(LED_YELLOW, LOW);
   }
-
-
-  //problem 1
   if (humidity <= sprinklersLowerTH) {
     //    Serial.println(sprinkleTime);
     //    Serial.println(currentTime);
@@ -117,54 +136,45 @@ void loop() {
     sprinkleTime = currentTime;
   }
 
-else {
+  else {
+    if (sprinkleTime + sprinklersRunTime < currentTime) {
+      digitalWrite(LED_BLUE, LOW);
+      sprinklersCheck = false;
 
-//if statement shorthanded
-  //unsigned long asd = sprinkleTime > sprinklersRunTime ? sprinkleTime - sprinklersRunTime : 0;
-  if (sprinkleTime + sprinklersRunTime < currentTime  ) {
-    digitalWrite(LED_BLUE, LOW);
-    sprinklersCheck = false;
-
-  }
-}
-//do the display feature here (button only)
-
-if (lastButtonState != button) {
-  lastButtonState = button;
-  if (button == LOW) {
-    int lastPotPinState = windowsAngle;
-    int currentPotPinState = map(currentPotPinState, 0, 1023, 0, 20);
-    state++;
-    if (state > 3) {
-      Display.clear();
-      state = 0;
     }
-    //problem 2
-    //do bools here
-    //      if(currentPotPinState != lastPotPinState){
-    //          Display.clear();
-    //          state = 3;
-    //        }
   }
-  lastButtonState = button;
-  delay(40);
-}
-if (state == 0) {
-  Display.clear();
-  Display.show(temp);
-}
-else if (state == 1) {
-  Display.clear();
-  Display.show(light);
-}
-else if (state == 2) {
-  Display.clear();
-  Display.show(humidity);
-}
-else if (state == 3) {
-  Display.clear();
-  Display.show(windowsAngle);
-}
+  //do the display feature here (button only)
+
+  if (lastButtonState != button) {
+    lastButtonState = button;
+    if (button == LOW) {
+      int lastPotPinState = windowsAngle;
+      int currentPotPinState = map(currentPotPinState, 0, 1023, 0, 20);
+      state++;
+      if (state > 3) {
+        Display.clear();
+        state = 0;
+      }
+    }
+    lastButtonState = button;
+    delay(40);
+  }
+  if (state == 0) {
+    Display.clear();
+    Display.show(temp);
+  }
+  else if (state == 1) {
+    Display.clear();
+    Display.show(light);
+  }
+  else if (state == 2) {
+    Display.clear();
+    Display.show(humidity);
+  }
+  else if (state == 3) {
+    Display.clear();
+    Display.show(windowsAngle);
+  }
 
 }
 void getTemperature() {
