@@ -12,6 +12,8 @@ namespace GreenHouseVS
 {
     public partial class Form1 : Form
     {
+
+        bool overrideWindows;
         string message;
         bool windows = false;
         public Form1()
@@ -23,7 +25,7 @@ namespace GreenHouseVS
         private void Form1_Load(object sender, EventArgs e)
         {
             serialPort1.BaudRate = 9600;
-            serialPort1.PortName = "COM3";
+            serialPort1.PortName = "COM4";
             serialPort1.Open();
             timer1.Start();
 
@@ -114,6 +116,25 @@ namespace GreenHouseVS
         private void btnClearLog_Click(object sender, EventArgs e)
         {
             lbxLog.Items.Clear();
+        }
+
+        private void btnClose_Click(object sender, EventArgs e)
+        {
+            if (!windows)
+            {
+                message = "Windows overridden";
+                lbxLog.Items.Add(message);
+                serialPort1.WriteLine("Windows overridden");
+                windows = true;
+            }
+
+            else
+            {
+                message = "Windows automatic";
+                lbxLog.Items.Add(message);
+                serialPort1.WriteLine("Windows automatic");
+                windows = false;
+            }
         }
     }
 }

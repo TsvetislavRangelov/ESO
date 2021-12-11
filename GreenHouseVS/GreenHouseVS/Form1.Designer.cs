@@ -120,6 +120,7 @@
             this.btnClose.TabIndex = 7;
             this.btnClose.Text = "Close";
             this.btnClose.UseVisualStyleBackColor = true;
+            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
             // lbxLog
             // 
@@ -146,18 +147,16 @@
             this.lblShades.AutoSize = true;
             this.lblShades.Location = new System.Drawing.Point(205, 164);
             this.lblShades.Name = "lblShades";
-            this.lblShades.Size = new System.Drawing.Size(51, 13);
+            this.lblShades.Size = new System.Drawing.Size(0, 13);
             this.lblShades.TabIndex = 10;
-            this.lblShades.Text = "Windows";
             // 
             // lblSprinklers
             // 
             this.lblSprinklers.AutoSize = true;
             this.lblSprinklers.Location = new System.Drawing.Point(205, 198);
             this.lblSprinklers.Name = "lblSprinklers";
-            this.lblSprinklers.Size = new System.Drawing.Size(51, 13);
+            this.lblSprinklers.Size = new System.Drawing.Size(0, 13);
             this.lblSprinklers.TabIndex = 11;
-            this.lblSprinklers.Text = "Windows";
             // 
             // lblTemp
             // 

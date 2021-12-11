@@ -27,13 +27,14 @@ int state = 0;
 int lastButtonState = HIGH;
 
 //windows variables
+bool overrideWindows = false;
 int lastPotPinValue = 0;
 String windowsMessage = "";
 int windowsAngle;
 bool windowsCheck = false;
 
-float windowsUpperTH = 21.00;
-float windowsLowerTH = 19.00;
+float windowsUpperTH = 18.00;
+float windowsLowerTH = 16.00;
 
 //shades variables
 String shadesMessage = "";
@@ -88,7 +89,7 @@ void loop() {
   }
 
   // windows
-  if (temp >= windowsUpperTH && windowsAngle >= 1) {
+  if (temp >= windowsUpperTH && windowsAngle >= 1 && overrideWindows == false) {
     digitalWrite(LED_GREEN, HIGH);
     if (!windowsCheck) {
       windowsCheck = true;
@@ -97,7 +98,7 @@ void loop() {
     }
 
   }
-  if (temp <= windowsLowerTH) {
+  if (temp <= windowsLowerTH && overrideWindows == false) {
     windowsAngle = map(windowsAngle, 0, 1023, 0, 20); // remapping since sensor doesn't read potpin in the false conditionals
 
     digitalWrite(LED_GREEN, LOW);
@@ -109,7 +110,7 @@ void loop() {
 
 
   }
-  if (temp >= windowsUpperTH && windowsAngle == 0) {
+  if (temp >= windowsUpperTH && windowsAngle == 0 && overrideWindows == false) {
     digitalWrite(LED_GREEN, LOW);
     windowsAngle = map(windowsAngle, 0, 1023, 0, 20);
     if (windowsCheck) {
@@ -130,6 +131,17 @@ void loop() {
     String message = Serial.readString();
     message.trim();
 
+    if (message == "Windows overridden") {
+      overrideWindows = true;
+    }
+
+    else if (message == "Windows automatic") {
+      overrideWindows = false;
+    }
+  }
+  if (overrideWindows) {
+    windowsAngle = 0;
+    digitalWrite(LED_GREEN, LOW);
   }
 
   // shades
