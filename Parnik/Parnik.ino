@@ -15,15 +15,15 @@ const int NTC = A1;
 
 //global variables
 
-const int lightInterval = 500; //ms
-const int humidityInterval = 2000;
+const int lightInterval = 500; // interval of getting new light for visual studio (in milliseconds)
+const int humidityInterval = 2000; // getting the humidity every 2 seconds to increase performance of the program
 unsigned long lightTime;
 unsigned long humidityTime;
 unsigned long tempTime;
 unsigned long sprinkleTime = millis();
 unsigned long currentTime = millis();
 const int sprinklersRunTime = 30000; // runtime of sprinklers (in milliseconds)
-const int TempInterval = 2000; // getting the temperature every half second to increase performance of the program
+const int TempInterval = 2000; // getting the temperature every 2 seconds to increase performance of the program
 float temp;
 float humidity;
 int state = 0;
