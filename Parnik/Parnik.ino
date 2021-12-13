@@ -1,3 +1,6 @@
+// Tsvetislav Rangelov
+// student number 4401336
+
 #include "Display.h"
 #include "DHT11.h"
 
@@ -12,17 +15,17 @@ const int NTC = A1;
 
 //global variables
 
+const int lightInterval = 500; //ms
 const int humidityInterval = 2000;
+unsigned long lightTime;
 unsigned long humidityTime;
 unsigned long tempTime;
 unsigned long sprinkleTime = millis();
 unsigned long currentTime = millis();
 const int sprinklersRunTime = 30000; // runtime of sprinklers (in milliseconds)
 const int TempInterval = 2000; // getting the temperature every half second to increase performance of the program
-
 float temp;
 float humidity;
-
 int state = 0;
 int lastButtonState = HIGH;
 
@@ -33,8 +36,8 @@ String windowsMessage = "";
 int windowsAngle;
 bool windowsCheck = false;
 
-float windowsUpperTH = 18.00;
-float windowsLowerTH = 16.00;
+float windowsUpperTH = 22.00;
+float windowsLowerTH = 20.00;
 
 //shades variables
 String shadesMessage = "";
@@ -47,15 +50,14 @@ int shadesLowerTH = 200;
 
 //sprinkler variables
 String sprinklersMessage = "";
-
 bool sprinklersCheck = false;
 float sprinklersLowerTH = 52.00;
 
 
 
 void setup() {
-  if (humidity > 90.00) { // setting an upper limit for humidity so that there are no possible values above 90, otherwise the sensor gets stuck
-    humidity = 90.00;
+  if (humidity > 95.00) { // setting an upper limit for humidity so that there are no possible values above 95, otherwise the sensor gets stuck
+    humidity = 95.00;
   }
   //getting both Humidity and Temperature at the start, otherwise the sensors won't read anything on startup
   getHumidity();
@@ -71,23 +73,26 @@ void setup() {
   pinMode(NTC, INPUT);
   pinMode(LDR, INPUT);
 }
-
 void loop() {
   currentTime = millis();
   int button = digitalRead(Button);
   int light = analogRead(LDR);
   windowsAngle = analogRead(POTPIN);
   windowsAngle = map(windowsAngle, 0, 1023, 0, 20);
+
+  //getting values from the sensors at a 2 second interval in order to not flood memory
+  if (currentTime - lightTime > lightInterval) {
+    printLight();
+    lightTime = currentTime;
+  }
   if (currentTime - humidityTime > humidityInterval) {
     getHumidity();
     humidityTime = currentTime;
   }
-
   if (currentTime - tempTime > TempInterval) {
     getTemperature();
     tempTime = currentTime;
   }
-
   // windows
   if (temp >= windowsUpperTH && windowsAngle >= 1 && overrideWindows == false) {
     digitalWrite(LED_GREEN, HIGH);
@@ -96,19 +101,15 @@ void loop() {
       windowsMessage = "OPEN";
       Serial.println(windowsMessage);
     }
-
   }
   if (temp <= windowsLowerTH && overrideWindows == false) {
     windowsAngle = map(windowsAngle, 0, 1023, 0, 20); // remapping since sensor doesn't read potpin in the false conditionals
-
     digitalWrite(LED_GREEN, LOW);
     if (windowsCheck) {
       windowsCheck = false;
       windowsMessage = "CLOSED";
       Serial.println(windowsMessage);
     }
-
-
   }
   if (temp >= windowsUpperTH && windowsAngle == 0 && overrideWindows == false) {
     digitalWrite(LED_GREEN, LOW);
@@ -118,23 +119,18 @@ void loop() {
       windowsMessage = "CLOSED";
       Serial.println(windowsMessage);
     }
-
   }
   //conditional windowsAngle change
   if (windowsAngle != lastPotPinValue) {
     state = 3;
     lastPotPinValue = windowsAngle; //saving the previous value of the potpin
   }
-
-
   if (Serial.available()) {
     String message = Serial.readString();
     message.trim();
-
     if (message == "Windows overridden") {
       overrideWindows = true;
     }
-
     else if (message == "Windows automatic") {
       overrideWindows = false;
     }
@@ -143,7 +139,6 @@ void loop() {
     windowsAngle = 0;
     digitalWrite(LED_GREEN, LOW);
   }
-
   // shades
   if (light >= shadesUpperTH) {
     digitalWrite(LED_YELLOW, HIGH);
@@ -161,6 +156,7 @@ void loop() {
       Serial.println(shadesMessage);
     }
   }
+  // sprinklers
   if (humidity <= sprinklersLowerTH) {
     //    Serial.println(sprinkleTime);
     //    Serial.println(currentTime);
@@ -173,7 +169,6 @@ void loop() {
     }
     sprinkleTime = currentTime;
   }
-
   else {
     if (sprinkleTime + sprinklersRunTime < currentTime) {
       digitalWrite(LED_BLUE, LOW);
@@ -188,8 +183,6 @@ void loop() {
   if (lastButtonState != button) {
     lastButtonState = button;
     if (button == LOW) {
-      int lastPotPinState = windowsAngle;
-      int currentPotPinState = map(currentPotPinState, 0, 1023, 0, 20);
       state++;
       if (state > 3) {
         Display.clear();
@@ -218,9 +211,17 @@ void loop() {
 }
 void getTemperature() {
   temp = DHT11.getTemperature();
-  Serial.println((String)temp + 't');
+  Serial.println("intervalTemp");
+  Serial.println(temp);
 }
 void getHumidity() {
   humidity = DHT11.getHumidity();
-  Serial.println((String)humidity + 'h');
+  Serial.println("intervalHum");
+  Serial.println(humidity);
+}
+
+void printLight() {
+  int newLight = analogRead(LDR);
+  Serial.println("lightPrint");
+  Serial.println(newLight);
 }

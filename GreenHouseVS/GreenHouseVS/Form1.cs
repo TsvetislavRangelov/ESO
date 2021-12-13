@@ -12,14 +12,11 @@ namespace GreenHouseVS
 {
     public partial class Form1 : Form
     {
-
-        bool overrideWindows;
         string message;
         bool windows = false;
         public Form1()
         {
             InitializeComponent();
-
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -29,6 +26,9 @@ namespace GreenHouseVS
             serialPort1.Open();
             timer1.Start();
 
+            lblWindows.Text = "Awaiting Input";
+            lblShades.Text = "Awaiting Input";
+            lblSprinklers.Text = "Awaiting Input";
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
@@ -45,35 +45,21 @@ namespace GreenHouseVS
 
                 logOutput = logOutput.Trim();
 
-                bool isTemp = float.TryParse(logOutput, out _);
-
-                //this is not a good way to do this, find something else, index out of bounds errors
-                //occur in some cases
-
-               /* if (logOutput[logOutput.Length - 1] == 't')
+                if(logOutput == "intervalHum")
                 {
-                    //doing - 1 in .Length because the string always has 1 more character than the index
-                    //since we start counting at 0 for the index and length returns the number of chars in the string
-                    logOutput = logOutput.Remove(logOutput.Length - 1, 1);
-                    lblTemp.Text = logOutput;
+                    lblHumidity.Text = serialPort1.ReadLine();
                 }
 
-                bool isHumidity = float.TryParse(logOutput, out _);
-
-                if (logOutput[logOutput.Length - 1] == 'h')
+                if(logOutput == "intervalTemp")
                 {
-                    logOutput = logOutput.Remove(logOutput.Length - 1, 1);
-                    lblHumidity.Text = logOutput;
+                    lblTemp.Text = serialPort1.ReadLine();
                 }
 
-                bool isLight = int.TryParse(logOutput, out _);
-
-                if (isLight)
+                if(logOutput == "lightPrint")
                 {
-                    lblLight.Text = logOutput;
-                } */
-               
-                
+                    lblLight.Text = serialPort1.ReadLine();
+                }
+              
                     if (logOutput == "OPEN")
                     {
                         lblWindows.Text = logOutput;
@@ -109,10 +95,8 @@ namespace GreenHouseVS
                     lblSprinklers.Text = logOutput;
                     lbxLog.Items.Add("Sprinklers are off");
                     }
-                
             }
         }
-
         private void btnClearLog_Click(object sender, EventArgs e)
         {
             lbxLog.Items.Clear();
@@ -122,6 +106,8 @@ namespace GreenHouseVS
         {
             if (!windows)
             {
+                lblWindows.Text = "CLOSED";
+                lbxLog.Items.Add("Windows are closed");
                 message = "Windows overridden";
                 lbxLog.Items.Add(message);
                 serialPort1.WriteLine("Windows overridden");
